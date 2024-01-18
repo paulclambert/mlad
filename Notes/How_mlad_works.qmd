@@ -1,4 +1,12 @@
-
+---
+title: "How mlad works"
+author: "Paul Lambert"
+date: "today"
+format:
+  html:
+    html-math-method: katex
+    self-contained: true
+---
 # How `mlad` works
 
 This is a brief explanation of how `mlad` works describing how it integrates with Stata’s optimizer `ml`. 
