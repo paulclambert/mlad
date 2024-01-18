@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.148">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Paul Lambert">
+
+<title>Example of fitting an stpm3 model using mlad</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="mlad_example_files/libs/clipboard/clipboard.min.js"></script>
+<script src="mlad_example_files/libs/quarto-html/quarto.js"></script>
+<script src="mlad_example_files/libs/quarto-html/popper.min.js"></script>
+<script src="mlad_example_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="mlad_example_files/libs/quarto-html/anchor.min.js"></script>
+<link href="mlad_example_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="mlad_example_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="mlad_example_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="mlad_example_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="mlad_example_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Example of fitting an stpm3 model using mlad</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Paul Lambert </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="loading-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-data">Loading Data</h2>
+<p>This loads the Rotterdam data from my website.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>. <span class="kw">use</span> https:<span class="co">//www.pclambert.net/data/rott3, clear</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Rotterdam breast cancer data (augmented with cause of death))</code></pre>
+</div>
+</div>
+</section>
+<section id="fitting-an-stpm3-model" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-an-stpm3-model">Fitting an <code>stpm3</code> model</h2>
+<p>We can now fit an flexible parametric model using <code>stpm3</code>. I will include the variabe <code>hormon</code> as a factor variable and <code>age</code> as a natural cubic spline.</p>
+<div class="cell styled-output" data-execution_count="2">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+. stpm3 i.hormon @ns(age,df(3)), scale(lncumhazard) df(4) initmod(exp) nolog</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                                                        Number of obs =  2,982
+                                                        Wald chi2(4)  = 132.42
+Log likelihood = -2884.0429                             Prob &gt; chi2   = 0.0000
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P&gt;|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+xb           |
+      hormon |
+        yes  |   .3731572   .0885452     4.21   0.000     .1996119    .5467026
+ _ns_f1_age1 |  -3.142327   .8938032    -3.52   0.000    -4.894149   -1.390505
+ _ns_f1_age2 |  -.9788548   .3796951    -2.58   0.010    -1.723043   -.2346661
+ _ns_f1_age3 |  -2.199723   .3953551    -5.56   0.000    -2.974604   -1.424841
+-------------+----------------------------------------------------------------
+time         |
+        _ns1 |  -25.52175   1.864219   -13.69   0.000    -29.17555   -21.86795
+        _ns2 |   8.048509   .9963344     8.08   0.000     6.095729    10.00129
+        _ns3 |  -1.016756   .0438515   -23.19   0.000    -1.102703   -.9308083
+        _ns4 |  -.6569238   .0476898   -13.77   0.000     -.750394   -.5634536
+       _cons |   .8747299   .1904223     4.59   0.000     .5015089    1.247951
+------------------------------------------------------------------------------
+Extended functions
+ (1) @ns(age, df(3))
+
+. estimates store stpm3
+
+. </code></pre>
+</div>
+</div>
+</section>
+<section id="running-mlad" class="level1">
+<h1>Running `mlad’</h1>
+<p>We need some starting values fo the parameters</p>
+<section id="starting-values" class="level2">
+<h2 class="anchored" data-anchor-id="starting-values">Starting values</h2>
+<p>This is a simple way to get initial valuesb by fitting an exponential model, predicting the log cumulative hazard anduse least squares.</p>
+<div class="cell styled-output" data-execution_count="3">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode stata code-with-copy"><code class="sourceCode stata"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>%%echo </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">streg</span> i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3, dist(<span class="fu">exp</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">predict</span> surv, surv</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">gen</span> lncumH = <span class="fu">ln</span>(-<span class="fu">ln</span>(surv))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">regress</span> lncumH i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3 _ns1 _ns2 _ns3 _ns4 <span class="kw">if</span> _d</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Store inital values</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span> b_init = <span class="fu">e</span>(b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+. streg i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3, dist(exp)
+
+         Failure _d: osi==1
+   Analysis time _t: os/12
+  Exit on or before: time 10*12
+        ID variable: pid
+
+Iteration 0:   log likelihood = -3022.1979  
+Iteration 1:   log likelihood = -2977.5856  
+Iteration 2:   log likelihood =  -2967.277  
+Iteration 3:   log likelihood = -2967.2473  
+Iteration 4:   log likelihood = -2967.2473  
+
+Exponential PH regression
+
+No. of subjects =       2,982                           Number of obs =  2,982
+No. of failures =       1,171
+Time at risk    = 20,002.4244
+                                                        LR chi2(4)    = 109.90
+Log likelihood = -2967.2473                             Prob &gt; chi2   = 0.0000
+
+------------------------------------------------------------------------------
+          _t | Haz. ratio   Std. err.      z    P&gt;|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      hormon |
+        yes  |   1.424495   .1256015     4.01   0.000     1.198417    1.693221
+ _ns_f1_age1 |   .0509612   .0453617    -3.34   0.001     .0089036     .291684
+ _ns_f1_age2 |   .3769882   .1429753    -2.57   0.010     .1792684    .7927781
+ _ns_f1_age3 |   .1230702   .0483402    -5.33   0.000     .0569919    .2657618
+       _cons |   .2219702   .0417761    -8.00   0.000     .1534947    .3209933
+------------------------------------------------------------------------------
+Note: _cons estimates baseline hazard.
+
+. predict surv, surv</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+. gen lncumH = ln(-ln(surv))
+
+. regress lncumH i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3 _ns1 _ns2 _ns3 _n
+&gt; s4 if _d
+
+      Source |       SS           df       MS      Number of obs   =     1,171
+-------------+----------------------------------   F(8, 1162)      &gt;  99999.00
+       Model |  639.715523         8  79.9644404   Prob &gt; F        =    0.0000
+    Residual |  2.9834e-11     1,162  2.5675e-14   R-squared       =    1.0000
+-------------+----------------------------------   Adj R-squared   =    1.0000
+       Total |  639.715523     1,170  .546765404   Root MSE        =    1.6e-07
+
+------------------------------------------------------------------------------
+      lncumH | Coefficient  Std. err.      t    P&gt;|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      hormon |
+        yes  |   .3538171   1.41e-08  2.5e+07   0.000     .3538171    .3538172
+ _ns_f1_age1 |  -2.976691   1.40e-07 -2.1e+07   0.000    -2.976691    -2.97669
+ _ns_f1_age2 |  -.9755414   6.06e-08 -1.6e+07   0.000    -.9755415   -.9755413
+ _ns_f1_age3 |  -2.095001   6.14e-08 -3.4e+07   0.000    -2.095001      -2.095
+        _ns1 |  -13.18746   2.23e-07 -5.9e+07   0.000    -13.18746   -13.18746
+        _ns2 |   3.111902   1.39e-07  2.2e+07   0.000     3.111902    3.111902
+        _ns3 |  -.9738248   2.18e-08 -4.5e+07   0.000    -.9738249   -.9738248
+        _ns4 |  -.6637326   4.45e-08 -1.5e+07   0.000    -.6637327   -.6637325
+       _cons |   .7966883   3.46e-08  2.3e+07   0.000     .7966882    .7966883
+------------------------------------------------------------------------------
+
+. 
+. // Store inital values
+. matrix b_init = e(b)
+
+. </code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

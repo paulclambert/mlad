@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+#PBS -o output.txt
+#PBS -e error.txt
+#PBS -N PyPoisson
+#PBS -l walltime=0:50:00
+#PBS -l vmem=32g
+#PBS -m bea
+#PBS -M paul.lambert@le.ac.uk
+#PBS -l nodes=1:ppn=28
+
+cd $PBS_O_WORKDIR
+
+# Set OMP_NUM_THREADS for OpenMP jobs
+export OMP_NUM_THREADS=$PBS_NUM_PPN
+
+module load stata/16/mp4
+module load python/gcc/3.6.4
+stata-mp -b do poisson_compare.do
+
+
+

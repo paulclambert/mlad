@@ -1,0 +1,14 @@
+// Updates to mlad after 1st release on SSC
+
+
+Version 1.1 2023-07-11
+  -- changed to include changes in jax indexing. 
+  -- upated so now work with Windows and latest version of jax (0.4.14)
+
+Version 1.01 2022-07-11
+  -- fixed bug with robust standard errors. Thanks to Jakub Červený
+
+Version 1.00 2021-08-03
+  -- first official release.
+
+  

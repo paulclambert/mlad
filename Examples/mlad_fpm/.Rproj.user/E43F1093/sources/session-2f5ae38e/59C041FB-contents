@@ -1,0 +1,28 @@
+library(MASS)
+X <- mvrnorm(100,c(0,0),matrix(c(1,0.5,0.5,1),nrow=2))
+
+naas <- ifelse(X[,2]<0,0.5,0)
+x1miss <- sample(1:100, size = sum(runif(100)<0.5))
+
+
+sim<-function() {
+  x <- mvrnorm(100,c(0,0),matrix(c(1,0.5,0.5,1),nrow=2))
+  y = 2 - x[,1] + 0.5*x[,2]+ rnorm(100,0,1)
+  result <- lm(y~x[,1] + x[,2])
+  return(result)
+}
+
+model <-sim()
+simres <- lapply(1:1000,function(i)model)
+
+
+x = data.frame(x1=rnorm(100),x2=rnorm(100))
+x$x2 <-0.5*x$x1 + sqrt(1-0.5^2)*x$x2
+
+x
+cor(x)
+mean(x[,2])
+
+y = 2 - x$x1 + 0.5*x$x2 + rnorm(100,0,1)
+model <- lm(y~x$x1+x$x2)
+confint(model)

@@ -1,0 +1,60 @@
+---
+title: "Example of fitting an stpm3 model using mlad"
+author: "Paul Lambert"
+format: html
+css: styles.css
+editor: visual
+execute:
+  keep-ipynb: true
+jupyter: nbstata
+---
+
+
+## Loading Data
+
+This loads the Rotterdam data from my website.
+
+```{stata}
+. use https://www.pclambert.net/data/rott3, clear
+```
+
+## Fitting an `stpm3` model
+
+We can now fit an flexible parametric model using `stpm3`.
+I will include the variabe `hormon` as a factor variable 
+and `age` as a natural cubic spline.
+
+```{stata}
+*| classes: styled-output
+*|echo: false
+%%echo
+stpm3 i.hormon @ns(age,df(3)), scale(lncumhazard) df(4) initmod(exp) nolog
+estimates store stpm3
+```
+
+
+# Running `mlad'
+
+We need some starting values fo the parameters
+
+## Starting values
+
+This is a simple way to get initial valuesb by fitting an exponential model,
+predicting the log cumulative hazard anduse least squares.
+
+
+```{stata}
+*| classes: styled-output
+*| code-fold: true
+*| code-summary: "Show the code"
+%%echo 
+streg i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3, dist(exp)
+predict surv, surv
+gen lncumH = ln(-ln(surv))
+regress lncumH i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3 _ns1 _ns2 _ns3 _ns4 if _d
+
+// Store inital values
+matrix b_init = e(b)
+```
+
+

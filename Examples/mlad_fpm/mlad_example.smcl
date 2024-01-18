@@ -1,0 +1,259 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}d:\GitSoftware\mlad\Examples\mlad_fpm\mlad_example.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}29 Nov 2023, 11:26:45
+{txt}
+{com}. // Load data
+. use https://www.pclambert.net/data/rott3, clear
+{txt}(Rotterdam breast cancer data (augmented with cause of death))
+
+{com}. 
+. // Use stpm3 model to fit simple model in Stata
+. // Variables
+. //   -- hormon (factor variable) 
+. //   -- age (natural spline)
+. stpm3  i.hormon @ns(age,df(3)), scale(lncumhazard) df(4) 
+{res}
+{txt}Iteration 0:{space 2}Log likelihood = {res:-2886.9797}  
+Iteration 1:{space 2}Log likelihood = {res:-2884.0565}  
+Iteration 2:{space 2}Log likelihood = {res:-2884.0429}  
+Iteration 3:{space 2}Log likelihood = {res:-2884.0429}  
+{res}
+{txt}{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:2,982}
+{txt}{col 57}{lalign 13:Wald chi2({res:4})}{col 70} = {res}{ralign 6:132.42}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-2884.0429}{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}xb           {txt}{c |}
+{space 6}hormon {c |}
+{space 8}yes  {c |}{col 14}{res}{space 2} .3731572{col 26}{space 2} .0885452{col 37}{space 1}    4.21{col 46}{space 3}0.000{col 54}{space 4} .1996119{col 67}{space 3} .5467026
+{txt}{space 1}_ns_f1_age1 {c |}{col 14}{res}{space 2}-3.142327{col 26}{space 2} .8938032{col 37}{space 1}   -3.52{col 46}{space 3}0.000{col 54}{space 4}-4.894149{col 67}{space 3}-1.390505
+{txt}{space 1}_ns_f1_age2 {c |}{col 14}{res}{space 2}-.9788548{col 26}{space 2} .3796951{col 37}{space 1}   -2.58{col 46}{space 3}0.010{col 54}{space 4}-1.723043{col 67}{space 3}-.2346661
+{txt}{space 1}_ns_f1_age3 {c |}{col 14}{res}{space 2}-2.199723{col 26}{space 2} .3953551{col 37}{space 1}   -5.56{col 46}{space 3}0.000{col 54}{space 4}-2.974604{col 67}{space 3}-1.424841
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}time         {txt}{c |}
+{space 8}_ns1 {c |}{col 14}{res}{space 2}-25.52175{col 26}{space 2} 1.864219{col 37}{space 1}  -13.69{col 46}{space 3}0.000{col 54}{space 4}-29.17555{col 67}{space 3}-21.86795
+{txt}{space 8}_ns2 {c |}{col 14}{res}{space 2} 8.048509{col 26}{space 2} .9963344{col 37}{space 1}    8.08{col 46}{space 3}0.000{col 54}{space 4} 6.095729{col 67}{space 3} 10.00129
+{txt}{space 8}_ns3 {c |}{col 14}{res}{space 2}-1.016756{col 26}{space 2} .0438515{col 37}{space 1}  -23.19{col 46}{space 3}0.000{col 54}{space 4}-1.102703{col 67}{space 3}-.9308083
+{txt}{space 8}_ns4 {c |}{col 14}{res}{space 2}-.6569238{col 26}{space 2} .0476898{col 37}{space 1}  -13.77{col 46}{space 3}0.000{col 54}{space 4} -.750394{col 67}{space 3}-.5634536
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .8747299{col 26}{space 2} .1904223{col 37}{space 1}    4.59{col 46}{space 3}0.000{col 54}{space 4} .5015089{col 67}{space 3} 1.247951
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}Extended functions
+ (1) @ns(age, df(3))
+{txt}
+{com}. estimates store stpm3
+{txt}
+{com}. 
+. // I will use the spline variables created by stpm3 when I use mlad
+. 
+. // Here is a simple way to get initial values
+. // fit exponential model & use least squares
+. streg i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3, dist(exp)
+
+{col 10}{txt}Failure {bf:_d}: {res}osi==1
+{col 4}{txt}Analysis time {bf:_t}: {res}os/12
+{col 3}{txt}Exit on or before: {res}time 10*12
+{col 9}{txt}ID variable: {res}pid
+
+{txt}Iteration 0:{space 2}Log likelihood = {res:-3022.1979}  
+Iteration 1:{space 2}Log likelihood = {res:-2977.5856}  
+Iteration 2:{space 2}Log likelihood = {res: -2967.277}  
+Iteration 3:{space 2}Log likelihood = {res:-2967.2473}  
+Iteration 4:{space 2}Log likelihood = {res:-2967.2473}  
+{res}
+{txt}Exponential PH regression
+
+No. of subjects = {res}{ralign 11:2,982}{col 57}{txt}{lalign 13:Number of obs} = {res}{ralign 6:2,982}
+{txt}No. of failures = {res}{ralign 11:1,171}
+{txt}Time at risk    = {res}{ralign 11:20,002.4244}
+{col 57}{txt}{lalign 13:LR chi2({res:4})} = {res}{ralign 6:109.90}
+{txt}Log likelihood = {res}-2967.2473{col 57}{txt}{lalign 13:Prob > chi2} = {res}{ralign 6:0.0000}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}          _t{col 14}{c |} Haz. ratio{col 26}   Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}hormon {c |}
+{space 8}yes  {c |}{col 14}{res}{space 2} 1.424495{col 26}{space 2} .1256015{col 37}{space 1}    4.01{col 46}{space 3}0.000{col 54}{space 4} 1.198417{col 67}{space 3} 1.693221
+{txt}{space 1}_ns_f1_age1 {c |}{col 14}{res}{space 2} .0509612{col 26}{space 2} .0453617{col 37}{space 1}   -3.34{col 46}{space 3}0.001{col 54}{space 4} .0089036{col 67}{space 3}  .291684
+{txt}{space 1}_ns_f1_age2 {c |}{col 14}{res}{space 2} .3769882{col 26}{space 2} .1429753{col 37}{space 1}   -2.57{col 46}{space 3}0.010{col 54}{space 4} .1792684{col 67}{space 3} .7927781
+{txt}{space 1}_ns_f1_age3 {c |}{col 14}{res}{space 2} .1230702{col 26}{space 2} .0483402{col 37}{space 1}   -5.33{col 46}{space 3}0.000{col 54}{space 4} .0569919{col 67}{space 3} .2657618
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .2219702{col 26}{space 2} .0417761{col 37}{space 1}   -8.00{col 46}{space 3}0.000{col 54}{space 4} .1534947{col 67}{space 3} .3209933
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {bf:_cons} estimates baseline hazard{txt}.{p_end}
+
+{com}. predict surv, surv
+{txt}
+{com}. gen logcumH = log(-log(surv))
+{txt}
+{com}. regress logcumH i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3 _ns1 _ns2 _ns3 _ns4 if _d
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,171
+{txt}{hline 13}{c +}{hline 34}   F(8, 1162)      > {res} 99999.00
+{txt}       Model {c |} {res} 639.715523         8  79.9644404   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 2.9834e-11     1,162  2.5675e-14   {txt}R-squared       ={res}    1.0000
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    1.0000
+{txt}       Total {c |} {res} 639.715523     1,170  .546765404   {txt}Root MSE        =   {res} 1.6e-07
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     logcumH{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}hormon {c |}
+{space 8}yes  {c |}{col 14}{res}{space 2} .3538171{col 26}{space 2} 1.41e-08{col 37}{space 1} 2.5e+07{col 46}{space 3}0.000{col 54}{space 4} .3538171{col 67}{space 3} .3538172
+{txt}{space 1}_ns_f1_age1 {c |}{col 14}{res}{space 2}-2.976691{col 26}{space 2} 1.40e-07{col 37}{space 1}-2.1e+07{col 46}{space 3}0.000{col 54}{space 4}-2.976691{col 67}{space 3} -2.97669
+{txt}{space 1}_ns_f1_age2 {c |}{col 14}{res}{space 2}-.9755414{col 26}{space 2} 6.06e-08{col 37}{space 1}-1.6e+07{col 46}{space 3}0.000{col 54}{space 4}-.9755415{col 67}{space 3}-.9755413
+{txt}{space 1}_ns_f1_age3 {c |}{col 14}{res}{space 2}-2.095001{col 26}{space 2} 6.14e-08{col 37}{space 1}-3.4e+07{col 46}{space 3}0.000{col 54}{space 4}-2.095001{col 67}{space 3}   -2.095
+{txt}{space 8}_ns1 {c |}{col 14}{res}{space 2}-13.18746{col 26}{space 2} 2.23e-07{col 37}{space 1}-5.9e+07{col 46}{space 3}0.000{col 54}{space 4}-13.18746{col 67}{space 3}-13.18746
+{txt}{space 8}_ns2 {c |}{col 14}{res}{space 2} 3.111902{col 26}{space 2} 1.39e-07{col 37}{space 1} 2.2e+07{col 46}{space 3}0.000{col 54}{space 4} 3.111902{col 67}{space 3} 3.111902
+{txt}{space 8}_ns3 {c |}{col 14}{res}{space 2}-.9738248{col 26}{space 2} 2.18e-08{col 37}{space 1}-4.5e+07{col 46}{space 3}0.000{col 54}{space 4}-.9738249{col 67}{space 3}-.9738248
+{txt}{space 8}_ns4 {c |}{col 14}{res}{space 2}-.6637326{col 26}{space 2} 4.45e-08{col 37}{space 1}-1.5e+07{col 46}{space 3}0.000{col 54}{space 4}-.6637327{col 67}{space 3}-.6637325
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .7966883{col 26}{space 2} 3.46e-08{col 37}{space 1} 2.3e+07{col 46}{space 3}0.000{col 54}{space 4} .7966882{col 67}{space 3} .7966883
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. // Store inital values
+. matrix b_init = e(b)
+{txt}
+{com}. 
+. // mlad is an alternative optimizer in Stata
+. // It calls Python and most calculations are performed within Python
+. // mlad requires a Python file to define the log-likelhood
+. 
+. // Python likelihood file
+. // arguments for function are 
+. //   -- beta - parameters
+. //   -- X    - data
+. //   -- wt   - weights (vector of 1's if no weights in mlad)
+. //   -- M    - dictionary containing othervars etc
+. 
+. // The Python file is only a few lines as the log-likelhood is simple
+. type fpm_hazard_ll.py
+{res}import jax.numpy as jnp   
+import mladutil as mu
+
+def python_ll(beta,X,wt,M):
+  xb   =  mu.linpred(beta,X,1)
+  time =  mu.linpred(beta,X,2)
+  eta = xb + time
+  dtime = jnp.dot(M["dns"], beta[1])[:,None] 
+  return(jnp.sum(wt*(M["_d"]*(jnp.log(dtime) + eta) - jnp.exp(eta))))
+{txt}
+{com}. 
+. // Note that gradient (score) and Hessian functions are automatically obtained
+. // from the above when using mlad using automatic differentiation.
+. 
+. // There is an option to include a Python setup file
+. // It is useful here as we need the derivatives of the log(time) spline variables 
+. // These are needed within the log-likelihood function
+. // The setup file is called once before the iterations start.
+. type fpm_setup.py
+{res}import jax.numpy as jnp
+from sfi import Macro
+def mlad_setup(M):
+  dnsvars = Macro.getGlobal("dnsvars").split()
+  dns = []
+  for v in range(len(dnsvars)):
+    dns.append(M[dnsvars[v]])
+    
+  dns.append(jnp.zeros((len(M[dnsvars[1]]),1)))
+  dns = (jnp.array(dns).squeeze(axis=2)).T
+  M["dns"] = dns
+  return(M)
+  
+{txt}
+{com}. 
+. // Fit model using mlad
+. // need to supply the two python files
+. // Setup two equations as stpm3
+. //   -- xb equation is for covariates effects
+. //   -- time equation is for effect of time
+. // Also the event indicator (_d) and derivatives (_dns1 _dns2 _dns3 _dns4) of
+. // the spline variables are needed
+. global dnsvars _dns1 _dns2 _dns3 _dns4
+{txt}
+{com}. mlad (xb:   = i.hormon _ns_f1_age1 _ns_f1_age2 _ns_f1_age3, nocons ) ///
+>      (time: = _ns1 _ns2 _ns3 _ns4)                                   ///
+>      , othervars(_d _dns1 _dns2 _dns3 _dns4)                         ///
+>        pysetup(fpm_setup)                                            ///
+>        llfile(fpm_hazard_ll)                                         ///
+>        init(b_init) search(off)                                                  
+{res}
+{txt}Iteration 0:{space 2}Log likelihood = {res:-2967.2473}  
+{res}{txt}Iteration 1:{space 2}Log likelihood = {res:-2886.9559}  
+{res}{txt}Iteration 2:{space 2}Log likelihood = {res:-2884.0586}  
+{res}{txt}Iteration 3:{space 2}Log likelihood = {res:-2884.0429}  
+{res}{txt}Iteration 4:{space 2}Log likelihood = {res:-2884.0429}  
+{res}{txt}
+{com}. estimates store mlad       
+{txt}
+{com}. // display estimates       
+. ml display
+
+{txt}{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:2,982}
+{txt}{col 57}{lalign 13:Wald chi2({res:4})}{col 70} = {res}{ralign 6:132.42}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-2884.0429}{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}xb           {txt}{c |}
+{space 6}hormon {c |}
+{space 8}yes  {c |}{col 14}{res}{space 2} .3731572{col 26}{space 2} .0885452{col 37}{space 1}    4.21{col 46}{space 3}0.000{col 54}{space 4} .1996119{col 67}{space 3} .5467026
+{txt}{space 1}_ns_f1_age1 {c |}{col 14}{res}{space 2}-3.142327{col 26}{space 2} .8938032{col 37}{space 1}   -3.52{col 46}{space 3}0.000{col 54}{space 4}-4.894149{col 67}{space 3}-1.390505
+{txt}{space 1}_ns_f1_age2 {c |}{col 14}{res}{space 2}-.9788548{col 26}{space 2} .3796951{col 37}{space 1}   -2.58{col 46}{space 3}0.010{col 54}{space 4}-1.723043{col 67}{space 3}-.2346661
+{txt}{space 1}_ns_f1_age3 {c |}{col 14}{res}{space 2}-2.199723{col 26}{space 2} .3953551{col 37}{space 1}   -5.56{col 46}{space 3}0.000{col 54}{space 4}-2.974604{col 67}{space 3}-1.424841
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}time         {txt}{c |}
+{space 8}_ns1 {c |}{col 14}{res}{space 2}-25.52175{col 26}{space 2} 1.864219{col 37}{space 1}  -13.69{col 46}{space 3}0.000{col 54}{space 4}-29.17555{col 67}{space 3}-21.86795
+{txt}{space 8}_ns2 {c |}{col 14}{res}{space 2} 8.048509{col 26}{space 2} .9963344{col 37}{space 1}    8.08{col 46}{space 3}0.000{col 54}{space 4} 6.095729{col 67}{space 3} 10.00129
+{txt}{space 8}_ns3 {c |}{col 14}{res}{space 2}-1.016756{col 26}{space 2} .0438515{col 37}{space 1}  -23.19{col 46}{space 3}0.000{col 54}{space 4}-1.102703{col 67}{space 3}-.9308083
+{txt}{space 8}_ns4 {c |}{col 14}{res}{space 2}-.6569238{col 26}{space 2} .0476898{col 37}{space 1}  -13.77{col 46}{space 3}0.000{col 54}{space 4} -.750394{col 67}{space 3}-.5634536
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .8747299{col 26}{space 2} .1904223{col 37}{space 1}    4.59{col 46}{space 3}0.000{col 54}{space 4} .5015089{col 67}{space 3} 1.247951
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // compare estimates and standard errors
+. estimates table stpm3 mlad, se
+{res}
+{txt}{hline 12}{c -}{c TT}{c -}{hline 10}{c -}{c -}{c -}{hline 10}{c -}{c -}
+{ralign 12:Variable} {c |} {center 10:stpm3} {space 1} {center 10:mlad} {space 1}
+{hline 12}{c -}{c +}{c -}{hline 10}{c -}{c -}{c -}{hline 10}{c -}{c -}
+{res}{txt}{res}xb           {txt}{c |}{res}
+{txt}{space 6}hormon {c |}
+{space 8}yes  {c |}{res} {ralign 10:.37315725}{txt} {space 1}{res} {ralign 10:.37315725}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.08854516}{txt} {space 1}{res} {ralign 10:.08854516}{txt} {space 1}
+{res}{txt}{space 12} {c |}
+{space 1}_ns_f1_age1 {c |}{res} {ralign 10:-3.1423274}{txt} {space 1}{res} {ralign 10:-3.1423274}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.89380321}{txt} {space 1}{res} {ralign 10:.89380321}{txt} {space 1}
+{res}{txt}{space 1}_ns_f1_age2 {c |}{res} {ralign 10:-.97885475}{txt} {space 1}{res} {ralign 10:-.97885475}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.37969509}{txt} {space 1}{res} {ralign 10:.37969509}{txt} {space 1}
+{res}{txt}{space 1}_ns_f1_age3 {c |}{res} {ralign 10:-2.1997227}{txt} {space 1}{res} {ralign 10:-2.1997227}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.39535509}{txt} {space 1}{res} {ralign 10:.39535509}{txt} {space 1}
+{res}{txt}{hline 12}{c -}{c +}{c -}{hline 10}{c -}{c -}{c -}{hline 10}{c -}{c -}
+{res}{txt}{res}time         {txt}{c |}{res}
+{txt}{space 8}_ns1 {c |}{res} {ralign 10:-25.521752}{txt} {space 1}{res} {ralign 10:-25.521752}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:1.864219}{txt} {space 1}{res} {ralign 10:1.864219}{txt} {space 1}
+{res}{txt}{space 8}_ns2 {c |}{res} {ralign 10:8.0485086}{txt} {space 1}{res} {ralign 10:8.0485087}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.99633437}{txt} {space 1}{res} {ralign 10:.99633437}{txt} {space 1}
+{res}{txt}{space 8}_ns3 {c |}{res} {ralign 10:-1.0167556}{txt} {space 1}{res} {ralign 10:-1.0167556}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.04385147}{txt} {space 1}{res} {ralign 10:.04385147}{txt} {space 1}
+{res}{txt}{space 8}_ns4 {c |}{res} {ralign 10:-.65692379}{txt} {space 1}{res} {ralign 10:-.65692379}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.04768975}{txt} {space 1}{res} {ralign 10:.04768975}{txt} {space 1}
+{res}{txt}{space 7}_cons {c |}{res} {ralign 10:.87472985}{txt} {space 1}{res} {ralign 10:.87472985}{txt} {space 1}
+{res}{txt}{space 12} {c |}{res} {ralign 10:.19042234}{txt} {space 1}{res} {ralign 10:.19042234}{txt} {space 1}
+{res}{txt}{hline 12}{c -}{c BT}{c -}{hline 10}{c -}{c -}{c -}{hline 10}{c -}{c -}
+{ralign 40:Legend: b/se}
+{res}{txt}
+{com}. 
+. // Note: leads to identical estimates
+. // mlad is faster in large datasets (depending on number of cores)
+. log close    
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}d:\GitSoftware\mlad\Examples\mlad_fpm\mlad_example.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}29 Nov 2023, 11:26:47
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

@@ -1,0 +1,233 @@
+## get current folder
+from os import getcwd, chdir
+import json
+starting_folder = "d:/github/stpm3pygraph/tests"
+
+## import dash
+from dash import Dash, html, dcc, callback, Input, Output
+import dash_mantine_components as dmc
+import plotly.graph_objects as go
+import plotly.express as px
+
+
+## configure stata
+import stata_setup
+stata_setup.config("C:/Program Files/Stata18/", "mp",splash=False)
+from pystata import stata
+from sfi import SFIToolkit
+
+## tab specific information
+import individual_predictions as ind
+import marginal_obs_exp as marg
+import general as gen
+
+
+## import modelinfo file
+## import modelinfo
+SFIToolkit.stata('qui adopath ++ d:/github/stpm3pygraph/ado')
+SFIToolkit.stata('sysdir set PLUS d:/ado/plus')
+SFIToolkit.stata('cd ' + starting_folder)
+
+chdir(starting_folder)
+modelinfo_file = open('_stpm3pycompare/stpm3pycompare_modelinfo.json')
+modelinfo = json.load(modelinfo_file)
+modelinfo_file.close()
+
+## Load data set
+SFIToolkit.stata('use _stpm3pycompare/stpm3pycompare')
+
+# colors
+colors = px.colors.qualitative.Light24
+
+app = Dash(__name__)
+
+## Header
+header = html.Div(dmc.Text("stpm3 fitting thing"),style={"backgroundColor": "#9c86e2"})
+
+## Footer 
+footer = html.Div(
+  [
+    dmc.Footer(
+      height=30,
+      fixed=True,
+      children=[dmc.Text("Paul Lambert")],
+      style={"backgroundColor": "#9c86e2"},
+    )
+  ]
+)
+
+## Graph
+ind_graph = dmc.Card(dcc.Graph(id='ind-graph-content'))
+marg_graph = dmc.Card(dcc.Graph(id='marg-graph-content'))
+
+## Control Panel
+#ind_control_panel = dmc.Card(html.Div(id='ind-control-panel'),withBorder=True)
+#marg_control_panel = dmc.Card(html.Div(id='marg-control-panel'),withBorder=True)
+
+## Model text
+model_code = dmc.Card(gen.get_model_code_table(modelinfo,colors))
+
+## individual components
+ind_covariate_panel = ind.GetCovariatePanel(modelinfo)
+ind_predtype_panel = ind.GetDisplayOptions()
+
+
+## marginal components
+marg_covariate_panel = marg.GetCovariatePanel(modelinfo)
+marg_predtype_panel = marg.GetDisplayOptions(modelinfo)
+
+
+## Tabs
+tabs = html.Div(
+  [
+    dmc.Tabs(
+      [
+        dmc.TabsList(
+          [
+            dmc.Tab("Individual Predictions", value="individual"),
+            dmc.Tab("Obs vs Expected Marginal ", value="marginal"),
+            dmc.Tab("Calibration", value="calibration"),
+            dmc.Tab("Technical Details", value="tech_details"),
+          ],
+        ), 
+        dmc.TabsPanel(
+          [
+            html.Div(ind_predtype_panel),
+            dmc.Grid(
+              children=[
+                dmc.Col(ind_graph,span=8),
+                dmc.Col(ind_covariate_panel,span=4)                     
+              ]
+            )
+          ],
+          value="individual"
+
+        ),
+        dmc.TabsPanel(
+          [
+            html.Div(marg_predtype_panel),
+            dmc.Grid(
+              children=[
+                dmc.Col(marg_graph,span=8),
+                dmc.Col(marg_covariate_panel,span=4)                     
+              ]
+            )
+          ],
+          value="marginal"
+        )           
+      ],
+      id = 'tab-select-analysis-type',
+      orientation="horizontal",
+      value = "individual"
+    ),
+  ]
+)
+
+## App layout"
+app.layout = dmc.MantineProvider(
+  children = [
+    header,
+    tabs,
+    model_code,
+    footer
+  ],
+  theme={"colorScheme": "dark"},
+  inherit=True,
+  withGlobalStyles=True,
+  withNormalizeCSS=True,  
+)
+
+## callback for individual prediction
+@callback(
+    Output('ind-graph-content', 'figure'),
+     inputs = dict(
+      graphoptions = dict(
+        predtype   = Input('individual-prediction-dropdown','value'),
+        ciselect   = Input('individual-ci-checkbox','value')
+      ),        
+      covvalues = ind.get_cov_callbacks(modelinfo)
+    ),
+)
+def update_ind_graph(covvalues,graphoptions):
+  Nmodels = len(modelinfo['modelnames'])
+  predtype = graphoptions['predtype']
+  ciselect = graphoptions['ciselect']
+  ind.update_predictions(modelinfo,covvalues,graphoptions)
+  df = stata.pdataframe_from_frame('survpred')
+  fig = go.Figure()
+  for m in range(Nmodels):
+    modelnum = m + 1
+    fig.add_trace(go.Scatter(x=df['tt'], y=df['S'+str(modelnum)], 
+                             mode='lines', line_color=colors[m],
+                             name=modelinfo['modelnames'][m],
+                             showlegend=True, legendgroup = modelnum,
+                             hovertemplate = modelinfo['modelnames'][m] +' = %{y:.2f}<extra></extra>'
+                            )
+                 ) 
+  yaxis_title = gen.get_yaxis_title(predtype)  
+  yrange = gen.get_y_range(df,predtype,Nmodels)
+  fig.update_yaxes(range=yrange)
+  fig.update_layout(template = 'plotly_dark',
+                    title_x = 0.5,
+                    xaxis_title='Years from diagnosis',
+                    yaxis_title = yaxis_title,
+                    font=dict(size=18),
+                    height = 600,
+                    hovermode='x unified',
+                    uirevision=1)
+  return(fig)     
+
+
+## callback for marginal obs/exp prediction
+@callback(
+    Output('marg-graph-content', 'figure'),
+     inputs = dict(
+     graphoptions = dict(
+        predtype = Input('marginal-prediction-dropdown','value'),
+        mselect  = Input('marginal-model-dropdown','value'),
+        ciselect = Input('marginal-ci-checkbox','value')
+      ),        
+      covselect = marg.get_cov_callbacks(modelinfo)
+    ),
+)
+def update_marginal_graph(covselect,graphoptions):
+  ngroups = covselect['ngroups']
+  mselect = graphoptions['mselect']
+  model = modelinfo['modelnames'][mselect]
+  predtype = graphoptions['predtype']
+  marg.update_predictions(modelinfo,model,covselect,graphoptions)
+  fig = go.Figure()
+  df = stata.pdataframe_from_frame('margpred',missingval='NaN')
+  for g in range(ngroups):
+    grpnum = g + 1
+    fig.add_trace(go.Scatter(x=df['tt'], y=df['S'+str(grpnum)], 
+                               mode='lines', line_color=colors[g],
+                               showlegend=True,
+                              )
+                   )
+    if 1:
+      dfsub = df[df['group']==grpnum].sort_values(by='_t')
+      fig.add_trace(go.Scatter(x=dfsub['_t'], y=dfsub['Skm'], 
+                               mode='lines', line_color=colors[g],opacity=0.5,
+                               line_shape="vh", line_dash="dash",
+                               showlegend=False,
+                              )
+                   )
+      
+      
+  fig.update_yaxes(range=[0,1])
+  yaxis_title = gen.get_yaxis_title(predtype) 
+  fig.update_layout(template = 'plotly_dark',
+                    title_x = 0.5,
+                    xaxis_title='Years from diagnosis',
+                    yaxis_title = yaxis_title,
+                    font=dict(size=18),
+                    height = 600,
+                    hovermode='x unified',
+                    uirevision=1)    
+  return(fig)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+

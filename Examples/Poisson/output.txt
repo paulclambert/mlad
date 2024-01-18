@@ -1,0 +1,2 @@
+Error occurred during initialization of VM
+Could not allocate metaspace: 1073741824 bytes

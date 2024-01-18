@@ -1,0 +1,4 @@
+=>> PBS: job killed: walltime 615 exceeded limit 600
+=>> PBS: job killed: walltime 925 exceeded limit 900
+=>> PBS: job killed: walltime 1821 exceeded limit 1800
+=>> PBS: job killed: walltime 3022 exceeded limit 3000
