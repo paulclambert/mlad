@@ -1,0 +1,10 @@
+v 3
+d mlad: auto diff optimizer via Python
+d Author: Paul C. Lambert
+d Distribution-Date: 20240413
+f mlad.sthlp
+f mlad_utility.sthlp
+f mlad.ado
+f mlad_ll.ado
+f mladutil.py
+e
